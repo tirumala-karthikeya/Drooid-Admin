@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, Mail, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { loginUser } from "@/services/authService";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LoginFormProps {
   setIsLoading?: (value: boolean) => void;
@@ -24,6 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setIsLoading }) => {
   
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const validateForm = () => {
     const newErrors: {
@@ -57,8 +57,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ setIsLoading }) => {
     if (setIsLoading) setIsLoading(true);
     
     try {
-      // Call the login API service
-      const response = await loginUser(email, password);
+      // Use the auth context's login function
+      await login(email, password);
       
       toast({
         title: "Login successful",

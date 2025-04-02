@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Define the API URL
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth`;
 
 interface AuthResponse {
   user: {

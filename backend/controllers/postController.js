@@ -52,6 +52,97 @@ const getAllPosts = async (req, res) => {
   }
 };
 
+// Search posts
+const searchPosts = async (req, res) => {
+  try {
+    const { q, field } = req.query;
+    const searchQuery = q;
+    const searchField = field;
+
+    if (!searchQuery) {
+      return res.status(400).json({ error: 'Search query is required' });
+    }
+
+    const request = req.app.locals.pool.request();
+    
+    let query = `
+      SELECT DISTINCT TOP 100
+        p.id,
+        p.title,
+        p.content,
+        p.regionofInterest,
+        p.imageUrl,
+        p.viewsCount,
+        p.commentsCount,
+        p.createdAt,
+        p.updatedAt,
+        p.topic,
+        p.subTopic,
+        p.trendScore,
+        p.tagline,
+        p.isFlagged,
+        p.storyDate,
+        p.decayed_trend_score
+      FROM posts p
+      WHERE 1=1
+    `;
+
+    if (searchField === 'id') {
+      const postId = parseInt(searchQuery);
+      if (isNaN(postId)) {
+        return res.status(400).json({ error: 'Invalid post ID' });
+      }
+      request.input('searchId', sql.Int, postId);
+      query += ` AND p.id = @searchId`;
+    } else if (searchField && searchField !== 'all') {
+      switch (searchField) {
+        case 'title':
+          request.input('searchTitle', sql.NVarChar, `%${searchQuery}%`);
+          query += ` AND p.title LIKE @searchTitle`;
+          break;
+        case 'topic':
+          request.input('searchTopic', sql.NVarChar, `%${searchQuery}%`);
+          query += ` AND p.topic LIKE @searchTopic`;
+          break;
+        case 'subTopic':
+          request.input('searchSubTopic', sql.NVarChar, `%${searchQuery}%`);
+          query += ` AND p.subTopic LIKE @searchSubTopic`;
+          break;
+        default:
+          request.input('searchAll', sql.NVarChar, `%${searchQuery}%`);
+          query += ` AND (
+            p.title LIKE @searchAll
+            OR p.topic LIKE @searchAll
+            OR p.subTopic LIKE @searchAll
+          )`;
+      }
+    } else {
+      request.input('searchAll', sql.NVarChar, `%${searchQuery}%`);
+      query += ` AND (
+        p.title LIKE @searchAll
+        OR p.topic LIKE @searchAll
+        OR p.subTopic LIKE @searchAll
+      )`;
+    }
+
+    query += ` ORDER BY p.createdAt DESC`;
+
+    console.log('Executing query:', query);
+    console.log('Search parameters:', { searchQuery, searchField });
+    
+    const result = await request.query(query);
+    console.log(`Found ${result.recordset.length} results`);
+    
+    res.json(result.recordset);
+  } catch (err) {
+    console.error('Error searching posts:', err);
+    res.status(500).json({ 
+      error: 'Failed to search posts',
+      message: err instanceof Error ? err.message : 'Unknown error'
+    });
+  }
+};
+
 // Delete a post
 const deletePost = async (req, res) => {
   const { id } = req.params;
@@ -77,5 +168,6 @@ const deletePost = async (req, res) => {
 
 module.exports = {
   getAllPosts,
-  deletePost
+  deletePost,
+  searchPosts
 }; 

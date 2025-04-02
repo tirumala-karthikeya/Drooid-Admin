@@ -1,13 +1,13 @@
-
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
   FileText,
   MessageSquare,
   AlertTriangle,
-  Clock
+  Clock,
+  LogOut
 } from "lucide-react";
 import {
   SidebarContent,
@@ -21,6 +21,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
   isMobileOpen: boolean;
@@ -28,6 +29,9 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isMobileOpen, setMobileOpen }: SidebarProps) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   const navigationItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/users", icon: Users },
@@ -42,6 +46,12 @@ export const Sidebar = ({ isMobileOpen, setMobileOpen }: SidebarProps) => {
     if (isMobileOpen) {
       setMobileOpen(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    handleNavigation();
   };
 
   return (
@@ -83,6 +93,21 @@ export const Sidebar = ({ isMobileOpen, setMobileOpen }: SidebarProps) => {
         </SidebarGroup>
 
         <SidebarSeparator />
+
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={handleLogout}
+                tooltip="Logout"
+                className="text-white hover:text-droid-orange"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </SidebarContent>
     </>
   );

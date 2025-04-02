@@ -7,6 +7,7 @@ import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PublicRoute from "@/components/PublicRoute";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 // Pages
 import Index from "@/pages/Index";
@@ -52,32 +53,44 @@ const App = () => (
           {/* Protected Routes */}
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
-              <Index />
+              <DashboardLayout>
+                <Index />
+              </DashboardLayout>
             </ProtectedRoute>
           } />
           <Route path="/users" element={
             <ProtectedRoute>
-              <Index />
+              <DashboardLayout>
+                <Index />
+              </DashboardLayout>
             </ProtectedRoute>
           } />
           <Route path="/posts" element={
             <ProtectedRoute>
-              <Posts />
+              <DashboardLayout>
+                <Posts />
+              </DashboardLayout>
             </ProtectedRoute>
           } />
           <Route path="/comments" element={
             <ProtectedRoute>
-              <Comments />
+              <DashboardLayout>
+                <Comments />
+              </DashboardLayout>
             </ProtectedRoute>
           } />
           <Route path="/reports" element={
             <ProtectedRoute>
-              <Index />
+              <DashboardLayout>
+                <Index />
+              </DashboardLayout>
             </ProtectedRoute>
           } />
           <Route path="/sessions" element={
             <ProtectedRoute>
-              <Sessions />
+              <DashboardLayout>
+                <Sessions />
+              </DashboardLayout>
             </ProtectedRoute>
           } />
           
